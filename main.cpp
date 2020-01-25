@@ -65,8 +65,8 @@ int main()
             plane.setPosition(plane.getPosition().x, plane.getPosition().y - 10);
             clock.restart();
         }
-        //window.draw(plane2);
-        //window.draw(plane);
+        window.draw(plane2);
+        window.draw(plane);
         window.display();
     }
 
