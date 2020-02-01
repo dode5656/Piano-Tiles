@@ -65,7 +65,7 @@ int main()
                     }
                     rectangles[i][i2].setPosition(rectangles[i][i2].getPosition().x, rectangles[i][i2].getPosition().y - 10);
                     for (int i = 0; i < LINES; i++) {
-                        if (rectangles[i][colored[i]].getPosition().y - rectangles[i][colored[i]].getSize().y == rectangles[bottomline][0].getPosition().y)
+                        if (rectangles[i][colored[i]].getPosition().y + rectangles[i][colored[i]].getSize().y == 0)
                         {
                             rectangles[i][colored[i]].setFillColor(Color::White);
                             std::cout << "test" << std::endl;
