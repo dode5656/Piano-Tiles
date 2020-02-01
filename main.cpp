@@ -68,7 +68,6 @@ int main()
                         if (rectangles[i][colored[i]].getPosition().y + rectangles[i][colored[i]].getSize().y == 0)
                         {
                             rectangles[i][colored[i]].setFillColor(Color::White);
-                            std::cout << "test" << std::endl;
                         }
                     }
                 }
