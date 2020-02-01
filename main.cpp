@@ -1,7 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <stdlib.h>
-#include <array>
 #define RECTANGLES 4
 #define LINES 6
 
