@@ -1,26 +1,29 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <stdlib.h>
+#include <array>
 #define RECTANGLES 4
-#define LINES 8
+#define LINES 6
 
 using namespace sf;
 
 int main()
 {
     RenderWindow window(VideoMode(900, 900), "Piano Tiles");
-    Texture planeTexture;
-    Texture tileTexture;
-    planeTexture.loadFromFile("plane.png");
-    tileTexture.loadFromFile("pianotile.png");
-    Sprite plane(planeTexture);
-    Sprite plane2(planeTexture);
-    std::vector<Sprite> tiles(LINES, Sprite(tileTexture));
     Clock clock;
-    plane.setScale((float)window.getSize().x / (float)plane.getTexture()->getSize().x, (float)window.getSize().y / (float)plane.getTexture()->getSize().y);
-    plane2.setScale((float)window.getSize().x / (float)plane2.getTexture()->getSize().x, (float)window.getSize().y / (float)plane2.getTexture()->getSize().y);
-    float rectanglesX[LINES][RECTANGLES];
-    float rectanglesY[LINES][RECTANGLES];
+    RectangleShape rectangles[LINES][RECTANGLES];
+    for (int i = 0; i < LINES; i++) {
+        for (int i2 = 0; i2 < RECTANGLES; i2++) {
+            rectangles[i][i2].setSize(Vector2f(window.getSize().x / RECTANGLES, window.getSize().y / LINES * 2));
+            rectangles[i][i2].setPosition(window.getSize().x / RECTANGLES * i2, (window.getSize().y / LINES * i) * 2);
+            rectangles[i][i2].setOutlineColor(Color::Black);
+            rectangles[i][i2].setOutlineThickness(2);
+            rectangles[i][i2].setFillColor(Color::White);
+        }
+    }
+    int bottomline = LINES - 1;
+    int colored[LINES] = {0};
+
     while (window.isOpen())
     {
         Event event;
@@ -30,43 +33,54 @@ int main()
                 window.close();
         }
         window.clear();
-        if (clock.getElapsedTime().asSeconds() >= 0.03f) {
-            for (int i = 0; i < LINES; i++)
+        float line = 1;
+        float counter = 1;
+        /*for (RectangleShape rectangle : rectangles)
+        {
+            rectangle.setFillColor(Color(255,255,255));
+            rectangle.setSize(Vector2f(window.getSize().x/RECTANGLES, window.getSize().y/(LINES/2.0f)));
+            rectangle.setOutlineColor(Color::Black);
+            rectangle.setOutlineThickness(2);
+            rectangle.setPosition((window.getSize().x/RECTANGLES) * counter, window.getSize().y / line);
+            if (counter == 4.0f)
             {
-                for (int j = 0; j < RECTANGLES; j++)
-                {
-                    if (i <= 4)
+                line++;
+                counter = 1;
+            }
+            if (line == 8.0f)
+                line = 1;
+            counter++;
+            window.draw(rectangle);
+        }*/
+        if (clock.getElapsedTime().asSeconds() >= 0.03f) {
+            for (int i = 0; i < LINES; i++) {
+                for (int i2 = 0; i2 < RECTANGLES; i2++) {
+                    if (rectangles[i][i2].getPosition().y + rectangles[i][i2].getSize().y <= 0)
                     {
-                        rectanglesX[i][j] = ((plane.getPosition().x + plane.getTexture()->getSize().x * plane.getScale().x) / 4) * j;
-                        rectanglesY[i][j] = ((plane.getPosition().y + plane.getTexture()->getSize().y * plane.getScale().y) / 4) * j;
+                        for (int j = 0; j < RECTANGLES; j++)
+                            rectangles[i][j].setPosition(rectangles[i][j].getPosition().x, rectangles[bottomline][0].getPosition().y+rectangles[i][j].getSize().y);
+                        bottomline = i;
+                        int random = rand() % RECTANGLES;
+                        rectangles[i][random].setFillColor(Color(97, 155, 255));
+                        colored[i] = random;
                     }
-                    else
-                    {
-                        rectanglesX[i][j] = ((plane2.getPosition().x + plane2.getTexture()->getSize().x * plane2.getScale().x) / 4) * j;
-                        rectanglesY[i][j] = ((plane2.getPosition().y + plane.getTexture()->getSize().y * plane.getScale().y) / 4) * j;
+                    rectangles[i][i2].setPosition(rectangles[i][i2].getPosition().x, rectangles[i][i2].getPosition().y - 10);
+                    for (int i = 0; i < LINES; i++) {
+                        if (rectangles[i][colored[i]].getPosition().y - rectangles[i][colored[i]].getSize().y == rectangles[bottomline][0].getPosition().y)
+                        {
+                            rectangles[i][colored[i]].setFillColor(Color::White);
+                            std::cout << "test" << std::endl;
+                        }
                     }
                 }
             }
-            int i = 0;
-            for (Sprite tile : tiles) {
-                tile.setPosition(rectanglesX[i][rand() % 4], rectanglesY[i][rand() % 4]);
-                tile.setScale(window.getSize().x / LINES/2, window.getSize().y / LINES/2);
-                window.draw(tile);
-                i++;
-            }
-            if (plane.getPosition().y + plane.getTexture()->getSize().y*plane.getScale().y <= 0)
-                plane.setPosition(plane.getPosition().x, window.getSize().y);
-            if (plane.getPosition().y <= 0)
-                plane2.setPosition(plane.getPosition().x, plane.getPosition().y + (plane.getTexture()->getSize().y * plane.getScale().y) - 10);
-            else
-                plane2.setPosition(plane2.getPosition().x, plane2.getPosition().y - 10);
-            if (plane2.getPosition().y + plane2.getTexture()->getSize().y*plane2.getScale().y <= 0)
-                plane2.setPosition(plane2.getPosition().x, window.getSize().y);
-            plane.setPosition(plane.getPosition().x, plane.getPosition().y - 10);
+
             clock.restart();
         }
-        window.draw(plane2);
-        window.draw(plane);
+
+        for (int i = 0; i < LINES; i++)
+            for (int i2 = 0; i2 < RECTANGLES; i2++)
+                window.draw(rectangles[i][i2]);
         window.display();
     }
 
