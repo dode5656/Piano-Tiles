@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <stdlib.h>
+#include <string>
 #define RECTANGLES 4
 #define LINES 6
 
@@ -21,7 +22,13 @@ int main()
         }
     }
     int bottomline = LINES - 1;
-    int colored[LINES] = {0};
+    int colored[LINES];
+    int score = 0;
+    Font font;
+    font.loadFromFile("Poppins-Regular.ttf");
+    Text scoretext;
+    scoretext.setFont(font);
+    scoretext.setFillColor(Color::Black);
 
     while (window.isOpen())
     {
@@ -30,27 +37,27 @@ int main()
         {
             if (event.type == Event::Closed)
                 window.close();
+            if (event.type == Event::MouseButtonPressed) {
+                for (int i = 0; i < LINES; i++)
+                {
+
+                    if (colored[i] >= 0 && colored[i] <= RECTANGLES)
+                    {
+                        if (event.mouseButton.x < rectangles[i][colored[i]].getPosition().x + rectangles[i][colored[i]].getSize().x
+                            && event.mouseButton.x > rectangles[i][colored[i]].getPosition().x
+                            && event.mouseButton.y < rectangles[i][colored[i]].getPosition().y + rectangles[i][colored[i]].getSize().y
+                            && event.mouseButton.y > rectangles[i][colored[i]].getPosition().y
+                            && rectangles[i][colored[i]].getFillColor() != Color(237, 237, 237))
+                        {
+                            score++;
+                            rectangles[i][colored[i]].setFillColor(Color(237, 237, 237));
+
+                        }
+                    }
+                }
+            }
         }
         window.clear();
-        float line = 1;
-        float counter = 1;
-        /*for (RectangleShape rectangle : rectangles)
-        {
-            rectangle.setFillColor(Color(255,255,255));
-            rectangle.setSize(Vector2f(window.getSize().x/RECTANGLES, window.getSize().y/(LINES/2.0f)));
-            rectangle.setOutlineColor(Color::Black);
-            rectangle.setOutlineThickness(2);
-            rectangle.setPosition((window.getSize().x/RECTANGLES) * counter, window.getSize().y / line);
-            if (counter == 4.0f)
-            {
-                line++;
-                counter = 1;
-            }
-            if (line == 8.0f)
-                line = 1;
-            counter++;
-            window.draw(rectangle);
-        }*/
         if (clock.getElapsedTime().asSeconds() >= 0.03f) {
             for (int i = 0; i < LINES; i++) {
                 for (int i2 = 0; i2 < RECTANGLES; i2++) {
@@ -65,9 +72,12 @@ int main()
                     }
                     rectangles[i][i2].setPosition(rectangles[i][i2].getPosition().x, rectangles[i][i2].getPosition().y - 10);
                     for (int i = 0; i < LINES; i++) {
-                        if (rectangles[i][colored[i]].getPosition().y + rectangles[i][colored[i]].getSize().y == 0)
+                        if (colored[i] >= 0 && colored[i] <= RECTANGLES)
                         {
-                            rectangles[i][colored[i]].setFillColor(Color::White);
+                            if (rectangles[i][colored[i]].getPosition().y + rectangles[i][colored[i]].getSize().y == 0)
+                            {
+                                rectangles[i][colored[i]].setFillColor(Color::White);
+                            }
                         }
                     }
                 }
@@ -79,6 +89,9 @@ int main()
         for (int i = 0; i < LINES; i++)
             for (int i2 = 0; i2 < RECTANGLES; i2++)
                 window.draw(rectangles[i][i2]);
+        scoretext.setString("Score: " + std::to_string(score));
+
+        window.draw(scoretext);
         window.display();
     }
 
